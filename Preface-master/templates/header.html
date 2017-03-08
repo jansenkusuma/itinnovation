@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Preface</title>
+    <link href="css/bootstrap.css" rel='stylesheet' type='text/css' />
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="js/jquery.min.js"></script>
+    <!-- Custom Theme files -->
+    <link href="css/style.css" rel='stylesheet' type='text/css' />
+    <link href="css/font-awesome.css" rel="stylesheet" type="text/css">
+    <!-- Custom Theme files -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="keywords" content="Preface Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
+          Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony Ericsson, Motorola web design" />
+    <!-- webfonts -->
+    <link href='//fonts.googleapis.com/css?family=Asap:400,700,400italic' rel='stylesheet' type='text/css'>
+    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>
+
+    <!-- webfonts -->
+    <!---- start-smoth-scrolling---->
+    <script type="text/javascript" src="js/move-top.js"></script>
+    <script type="text/javascript" src="js/easing.js"></script>
+</head>
+<body>
+    <div id="home" class="header">
+        <div class="container">
+            <!-- top-hedader -->
+            <div class="top-header">
+                <!-- /logo -->
+                <!--top-nav---->
+                <div class="top-nav">
+                    <div class="navigation">
+                        <div class="logo">
+                            <h1><a href="home.php"><span>P</span>REFACE</a></h1>
+                        </div>
+                        <div class="float_center">
+                            <form class="search" action="">
+                                <input type="text" id="search" style="width: 300px" autocomplete="off">
+                                <div id="display"></div>
+                            </form>
+                        </div>
+
+                        <div class="navigation-right">
+
+                            <nav class="link-effect-3" id="link-effect-3">
+
+                                <ul class="nav1 nav nav-wil">
+                                {% if verify['login'] == 1 %}
+                                    <li id="alreadylogin">
+                                    <button onclick="myFunction()" class="dropbtn"><img src="images/user.png" style="width: 32px; height: 32px"></a></button>
+                                          <div id="myDropdown" class="dropdown-content">
+                                          {% block option %} 
+                                            <a href="profile.php">View Profile</a>
+                                            <a href="logout.php">Log Out</a>
+                                          {% endblock %}  
+                                          </div>
+                                    </li>
+                                {% else %}
+                                    <li id="login">
+                                        <a href="login.php">Login or Register</a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if verify['verify'] != 1 %}
+            <div id="verify">
+                <p> 
+                    Verify your email address <span class="underline"> {{verify['email']}} </span> to strengthen the protection of your account 
+                    ( <a id="send-verify">Send verification email</a> ) 
+                    <a class="cancel" onclick="closeVerify()">&times;</a>
+                </p>
+            </div>
+            <link rel="stylesheet" type="text/css" href="">
+        {% endif %}
+    </div>
+    <div class="space"></div>
+    {% block body %}{% endblock %}
+    {% block script %}
+    <script type="text/javascript">
+        var typingTimer;                //timer identifier
+        var doneTypingInterval = 100;  //time in ms, 5 second for example
+        var $search = $('#search');
+
+        //on keyup, start the countdown
+        $search.on('keyup', function () {
+          clearTimeout(typingTimer);
+          typingTimer = setTimeout(doneTyping, doneTypingInterval);
+        });
+
+        //on keydown, clear the countdown 
+        $search.on('keydown', function () {
+          clearTimeout(typingTimer);
+        });
+        
+
+        //user is "finished typing," do something
+        function doneTyping () {
+          var name = $('#search').val();
+                console.log("b");
+                if(name==""){
+                    console.log("c");
+                    document.getElementsByClassName("results")[0].style.display = "block";
+                    $( ".results" ).remove();
+                }
+                else{
+                    $( ".results" ).remove();
+                    $.ajax({
+                        type: "GET",
+                        url: "search.php",
+                        async: false,
+                        
+                        data: "username="+ name,
+                        beforeSend: function (xhr) {
+                            if (xhr && xhr.overrideMimeType) {
+                              xhr.overrideMimeType('application/json;charset=utf-8');
+                            }
+                          },
+                          dataType: 'json',
+                        success: function(data){
+                            // JSON.parse(data);
+                            console.log("e");
+                            output = document.getElementsByClassName("search");
+                            ul = document.createElement("ul");
+                            ul.setAttribute("class", "results");
+                            // data = JSON.parse(profile);
+                            if (data.length > 0) {
+                                for (i = 0; i <data.length; i++) {
+                            // for (var key in data) {
+                            //     if (data.hasOwnProperty(key)) {
+                                user = data[i];
+                                li = document.createElement("li");
+                                a = document.createElement("a");
+                                a.setAttribute('href', "profile.php?id=" + user.id);
+                                img = document.createElement("img");
+                                img.setAttribute('src', user.pic);
+                                a.appendChild(img);
+                                a.innerHTML += "   " + user.username;
+                                li.appendChild(a);
+                                ul.appendChild(li);
+                                // }
+                                }
+                            }else {
+                                li = document.createElement("li");
+                                a = document.createElement("a");
+                                a.style.cursor = "not-allowed";
+                                a.innerHTML += "No Result";
+                                li.appendChild(a);
+                                ul.appendChild(li);
+                            }
+                            
+
+                            output[0].appendChild(ul);
+                            document.getElementsByClassName("results")[0].style.display = "block";
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                            alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                        }
+                    });
+                } 
+        }
+        // $(document).ready(function(){
+        //     $("#search").keyup(function() {
+        //         console.log("a");
+        //         var name = $('#search').val();
+        //         console.log("b");
+        //         if(name==""){
+        //             console.log("c");
+        //             $("#display").html("");
+        //         }
+        //         else{
+        //             $("#display").html("");
+        //             $.ajax({
+        //                 type: "GET",
+        //                 url: "search.php",
+        //                 async: false,
+                        
+        //                 data: "username="+ name,
+        //                 beforeSend: function (xhr) {
+        //                     if (xhr && xhr.overrideMimeType) {
+        //                       xhr.overrideMimeType('application/json;charset=utf-8');
+        //                     }
+        //                   },
+        //                   dataType: 'json',
+        //                 success: function(data){
+        //                     // JSON.parse(data);
+        //                     console.log("e");
+        //                     output = document.getElementById("display");
+        //                     ul = document.createElement("ul");
+        //                     ul.setAttribute("class", "search");
+        //                     // data = JSON.parse(profile);
+        //                     for (i = 0; i <data.length; i++) {
+        //                     // for (var key in data) {
+        //                     //     if (data.hasOwnProperty(key)) {
+        //                             user = data[i];
+        //                             li = document.createElement("li");
+        //                             a = document.createElement("a");
+        //                             a.setAttribute('href', "profile.php?id=" + user.id);
+        //                             a.innerHTML = user.username;
+        //                             li.appendChild(a);
+        //                             ul.appendChild(li);
+        //                         // }
+        //                     }
+        //                     output.appendChild(ul);
+        //                 },
+        //                 error: function(XMLHttpRequest, textStatus, errorThrown) { 
+        //                     alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+        //                 }
+        //             });
+        //         } 
+        //     });
+        // });
+    </script>
+    {% endblock %}
+</body>
+</html>

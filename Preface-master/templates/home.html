@@ -1,0 +1,156 @@
+    {% extends "header.html" %}
+    {% block body %}
+        <div id="myNav" class="overlay">
+            <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+            <div class="overlay-content">
+                <form action="insertPost.php" method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="hidden-id" id="hidden-id" />
+                    <input id="f02" type="file" name="image" placeholder="Add profile picture" onchange="readURL(this);" accept="image/*"/>
+                    <label id="label-f02" for="f02"><img src="images/no_image.png" id="post-image" alt="Your image"></label>
+
+                    <textarea id="description" name="desc"></textarea>
+                    <input type="submit" name="post-btn" value="POST" id="post-btn"/>  
+                </form>
+            </div>
+        </div>
+        {% for post in posts %}
+    <div class="post">
+        <div class="post-head">
+                
+            <img src="{{post['profile_pic']}}" class="profile-pic"><a href="profile.php?id={{post['profile_id']}}" id="username">{{post['username']}}</a>
+        
+            <p class="time-post"> {{post['postdate']}}<br></p>
+        </div>
+        <div class="post-img">
+            <input type="hidden" name="p-id" value="{{post['id']}}" />
+            <i class="fa fa-heart"></i>
+            <img src="{{post['image']}}">
+        </div>
+        <div class="post-description" id="post">
+            <p>{{post['description']}}</p>
+            {% if  post['access'] == 1 %}
+                <div class="dropdown">
+                    <button class="dropdown-button" data-toggle="dropdown"><i class="fa fa-ellipsis-h"></i></button>
+                    
+                    <div id="myDropdown" class="dropdown-option">
+                        <a class="editPost">Edit Post</a>
+                        <a class="deletePost">Delete Post</a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+        {% endfor %}
+        
+
+        <div class="space"></div>
+        <div class="footer">
+            <div class="post-button">
+                <button onclick="openNav();">POST</button>
+            </div>
+        </div>
+    {% endblock %}
+    {% block script %}
+        {{parent()}}
+        <script>
+            
+            $("#post button").on("click",function(event){
+                var current=$(this).next();
+                var grandparent=$(this).parent().parent();
+                current.toggle();
+             });
+            
+            function myFunction() {
+                document.getElementById("myDropdown").classList.toggle("show");
+            }
+            
+            function closeVerify(){
+                document.getElementById("verify").style.display = 'none';
+            }
+            function openNav() {
+                document.getElementById("myNav").style.height = "80%";
+                document.getElementById("post-image").src = "images/no_image.png";
+                document.getElementById("description").value = '';
+                document.getElementById("post-btn").value = 'POST';
+                document.getElementById("hidden-id").value = null;
+            }
+
+            function closeNav() {
+                document.getElementById("myNav").style.height = "0%";
+            }
+            function readURL(input) {
+                // if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        document.getElementById("post-image").src = e.target.result;
+                    }
+
+                    reader.readAsDataURL(input.files[0]);
+                // }
+            }
+            
+            $(document).ready(function() {
+                $(".post-img").dblclick(function() {
+                    var id = $(this).parent().find("input[type=hidden]").val();
+                    var heart = $(this).parent().find("i");
+                    $.ajax({
+                       type: "GET",
+                       url: "like.php?id="+id,
+                       //data: "id=" + javascriptVariable,
+                       success: function(){
+                           heart.fadeIn("slow");
+                            setTimeout(function() {
+                                heart.fadeOut("slow");
+                            }, 2000);                     
+                        }
+                    });
+                });
+                $(".deletePost").on("click",function(event){
+                    var id = $(this).parent().parent().parent().parent().find("input[type=hidden]").val();
+                    var page = $(this);
+
+                    $.ajax({
+                        type: "GET",
+                        url: "delete-post.php?id="+id,
+                        success: function(){
+                            page.parent().parent().parent().parent().remove();
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                            alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                        }
+                    });
+                 });
+                $(".editPost").on("click",function(event){
+                    var id = $(this).parent().parent().parent().parent().find("input[type=hidden]").val();
+                    console.log(id);
+                    var description = $(this).parent().parent().parent().parent().find(".post-description p").text();
+                    console.log(description);
+                    var img = $(this).parent().parent().parent().parent().find(".post-img img").attr('src');
+                    console.log(img);
+                    document.getElementById('hidden-id').value = id;
+                    document.getElementById("post-image").src = img;
+                    document.getElementById("description").value = description;
+                    document.getElementById("myNav").style.height = "80%";
+                    document.getElementById("post-btn").value = 'UPDATE';
+
+                    
+                 });
+
+                $("#send-verify").on("click",function(event){
+                    $.ajax({
+                        type: "GET",
+                        url: "send-verify.php",
+                        success: function(data){
+                            console.log(data);
+                            alert("Link verification already sended to your email");
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                            alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                        }
+                    });
+                 });
+
+
+            });
+        </script>
+    {% endblock %}

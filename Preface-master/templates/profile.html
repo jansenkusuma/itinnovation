@@ -1,0 +1,165 @@
+    {% extends "header.html" %}
+    {% block option %} 
+        {% if profile['match'] != 1 %}
+            <a href="profile.php">View Profile</a>
+        {% else %}
+            <a href="profile-update.php">Edit Profile</a>
+        {% endif %}
+        <a href="">Change Password</a>
+        <a href="logout.php">Log Out</a>
+    {% endblock %}
+    {% block body %}    
+        <div class="banner-info">
+            <div class="col-md-7 header-right">
+                <h1>Hi !</</h1>
+                <h6>{% if profile['job'] == '' %}
+                        FREE
+                    {% else %}
+                        {{profile['job']}}
+                    {% endif %}    
+                
+                    {% if profile['match'] != 1 %}
+                        <a class=\"a-btn-a scroll\" id="follow">
+                            {% if profile['follow'] == 1 %}
+                                Following
+                            {% else %}
+                                Follow+
+                            {% endif %}
+                        </a> 
+                        
+                    {% endif %}   
+                </h6>
+                <ul class="address">
+
+                    <li>
+                        <ul class="address-text">
+                            <li><b>NAME</b></li>
+                            <li>{{profile['name']}}</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="address-text">
+                            <li><b>D.O.B</b></li>
+                            <li>{{profile['dob']}}</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="address-text">
+                            <li><b>PHONE </b></li>
+                            <li>{{profile['phone']}}</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="address-text">
+                            <li><b>E-MAIL </b></li>
+                            <li><a href="mailto:{{profile['email']}}">{{profile['email']}}</a></li>
+                        </ul>
+                    </li>
+                    <li>
+                        <ul class="address-text">
+                            <li><b>WEBSITE </b></li>
+                            <li><a href="http:\\{{profile['website']}}">{{profile['website']}}</a></li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </div>
+            <div class="col-md-5 header-left">
+                <img src="{{profile['profile_pic']}}">
+            </div>
+            <div class="clearfix"> </div>
+
+        </div>
+
+    <!--    </div>
+            </div>
+            </div> -->
+        <div id="about" class="about">
+            <div class="col-md-7 about-left">
+                <div id="owl-demo1" class="owl-carousel owl-carousel2">
+                    <div class="item">
+                        <div class="about-left-grid">
+                            <h2>Hi! I'm <span>{{profile['name']}}</span></h2>
+                            <p>{{profile['description']}}</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+                <div class="col-md-5 about-right" style="background:url({{profile['profile_pic']}}) no-repeat 0px 0px; background-size : cover;">
+
+            </div>
+            <div class="clearfix" > </div>
+            <link href="css/owl.carousel.css" rel="stylesheet">
+            <script src="js/owl.carousel.js"></script>
+            <script>
+                    $(document).ready(function () {
+                        $("#owl-demo1").owlCarousel({
+                            items: 1,
+                            lazyLoad: false,
+                            autoPlay: true,
+                            navigation: false,
+                            navigationText: false,
+                            pagination: true,
+                        });
+                    });
+            </script>
+            <!-- Feedback -->
+            <script>
+                $(document).ready(function () {
+                    $("#owl-demo3").owlCarousel({
+                        items: 1,
+                        lazyLoad: false,
+                        autoPlay: true,
+                        navigation: false,
+                        navigationText: true,
+                        pagination: true,
+                    });
+                });
+            </script>
+        </div>
+            <!-- /about -->
+        <div id="photos" class="photos">
+            <div class="container">
+                
+                {% for post in posts %}
+                    <div class="photo">
+                        <a href="">
+                            <img src="{{post['img']}}" >
+                            <span> {{post['like']}} <i class="fa fa-heart"></i> {{post['comment']}} <i class="fa fa-comments"></i></span>
+                        </a>
+                    </div>                     
+                {% endfor %}
+
+            </div>
+        </div>
+
+        <a href="#home" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
+    {% endblock %}
+    {% block script %}
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $().UItoTop({easingType: 'easeOutQuart'});
+        });
+    </script>
+    <script>
+        function myFunction() {
+            document.getElementById("myDropdown").classList.toggle("show");
+        }
+        $("#follow").on("click",function(event){
+            var id = {{profile['id']}};
+            $.ajax({
+                type: "GET",
+                url: "follow.php?id="+id,
+                success: function(data){
+                    $("#follow").html(data);                  
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) { 
+                    alert("Status: " + textStatus); alert("Error: " + errorThrown); 
+                }
+            });
+         });
+    </script>
+    <script src="js/bootstrap.js"></script>
+    {% endblock %}
+
